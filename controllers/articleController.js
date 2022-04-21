@@ -42,14 +42,41 @@ const renderArticles = async (req, res) => {
   const tag = req.query.tag;
   const favorited = req.query.favorited;
 
-  if (author) {
-    try {
-      const user = await User.findOne({ username: author });
-      const articlesCount = await Article.find({ author: user._id }).count();
-      const articles = await Article.find({ author: user._id });
-      res.json({ articles, articlesCount });
-    } catch (err) {
-      res.json({ message: err });
+    let articlesCount = 0
+    let articles = []
+   
+
+    if(author){
+      try {
+            const user = await User.findOne({username: author})
+            articlesCount = await Article.find({author: user._id}).count()
+            articles = await Article.find({author: user._id})
+            res.json({articles, articlesCount})
+              } catch (err) {
+            res.json({articles, articlesCount})
+            }
+      } else if (tag){
+          articles = await Article.find({tagList: tag})
+          articlesCount = await Article.find({tagList: tag}).count()
+          
+          res.json({articles, articlesCount})
+        } else if (favorited){
+          const user = await User.findOne({username: favorited})
+          articles = await Article.find({favoritedBy: user._id})
+          articlesCount = await Article.find({favoritedBy: user._id}).count()
+          console.log(articles)
+          res.json({articles, articlesCount})
+            
+        
+        } else {
+          try {
+            articlesCount = await Article.find().count()
+            articles = await Article.find().sort('-createdAt').exec()
+            res.json( { articles, articlesCount })
+           
+        } catch (err) {
+            res.json({articles, articlesCount})
+        }
     }
   } else if (tag) {
     const articles = await Article.find({ tagList: tag });
