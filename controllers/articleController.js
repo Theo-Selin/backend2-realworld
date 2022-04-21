@@ -78,27 +78,7 @@ const renderArticles = async (req, res) => {
             res.json({articles, articlesCount})
         }
     }
-  } else if (tag) {
-    const articles = await Article.find({ tagList: tag });
-    const articlesCount = await Article.find({ tagList: tag }).count();
-
-    console.log(articles);
-    res.json({ articles, articlesCount });
-  } else if (favorited) {
-    const user = await User.findOne({ username: favorited });
-    const articles = await Article.find({ favoritedBy: user._id });
-    const articlesCount = await Article.find({ favoritedBy: user._id }).count();
-    console.log(articles);
-    res.json({ articles, articlesCount });
-  } else {
-    try {
-      const articlesCount = await Article.find().count();
-      const articles = await Article.find().sort('-createdAt').exec();
-      res.json({ articles, articlesCount });
-    } catch (err) {
-      res.json({ message: err });
-    }
-  }
+ 
 };
 
 const deleteArticle = async (req, res) => {
