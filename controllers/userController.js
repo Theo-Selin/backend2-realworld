@@ -85,9 +85,8 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const getMe = asyncHandler(async (req, res) => {
-
   const user = req.user;
-  
+
   const { userId } = user;
   const currentUser = await User.findOne({ _id: userId });
 
@@ -102,37 +101,63 @@ const getMe = asyncHandler(async (req, res) => {
   });
 });
 
-
 const updateUser = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { userId } = user;
+  const { email, username, image, bio, password } = req.body.user;
 
-  let password = req.body.user.password;
+  //const { userId } = user;
 
-  const hash = await bcrypt.hash(password, 10);
-  password = hash;
-
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
+  const updatedUser = await User.findOneAndUpdate(
     {
-      image: req.body.user.image,
-      username: req.body.user.username,
-      email: req.body.user.email,
-      bio: req.body.user.bio,
-      password,
+      _id: user.userId,
     },
-    { new: true }
+    {
+      email,
+      password,
+      bio,
+      username,
+      image,
+    },
+    { returnDocument: 'after' }
+    //{ new: true }
   );
 
   res.json({
     user: {
-      image: updatedUser.image,
-      username: updatedUser.username,
       email: updatedUser.email,
+      username: updatedUser.username,
       bio: updatedUser.bio,
+      image: updatedUser.image,
       token: req.token,
     },
   });
+
+  //let password = req.body.user.password;
+
+  //const hash = await bcrypt.hash(password, 10);
+  //password = hash;
+
+  // const updatedUser = await User.findByIdAndUpdate(
+  //   userId,
+  //   {
+  //     image: req.body.user.image,
+  //     username: req.body.user.username,
+  //     email: req.body.user.email,
+  //     bio: req.body.user.bio,
+  //     password,
+  //   },
+  //   { new: true }
+  // );
+
+  // res.json({
+  //   user: {
+  //     image: updatedUser.image,
+  //     username: updatedUser.username,
+  //     email: updatedUser.email,
+  //     bio: updatedUser.bio,
+  //     token: req.token,
+  //   },
+  // });
 });
 
 const getProfile = asyncHandler(async (req, res) => {
